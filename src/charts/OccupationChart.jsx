@@ -50,7 +50,6 @@ export default function OccupationChart() {
     Promise.all([
       d3.csv("/data/all_data_M_2019.csv"),
       d3.csv("/data/all_data_M_2020.csv"),
-      d3.csv("/data/all_data_M_2021.csv"),
       d3.csv("/data/all_data_M_2022.csv"),
       d3.csv("/data/all_data_M_2023.csv"),
       d3.csv("/data/all_data_M_2024.csv"),
@@ -59,7 +58,6 @@ export default function OccupationChart() {
       const years = [
         2019,
         2020,
-        2021,
         2022,
         2023,
         2024,
