@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 
-import sectorData from "../data/job_postings_by_sector_US.csv?raw";
+const sectorDataUrl =
+  "/data/job_postings_by_sector_US.csv";
 
 export default function SectorCollapseChart() {
   const svgRef = useRef();
@@ -64,6 +65,9 @@ export default function SectorCollapseChart() {
   // STATE
   // =====================================================
 
+  const [parsedData, setParsedData] =
+    useState([]);
+
   const [selectedCategory, setSelectedCategory] =
     useState("Technology");
 
@@ -74,45 +78,45 @@ export default function SectorCollapseChart() {
     useState(null);
 
   // =====================================================
-  // PARSE CSV
+  // LOAD CSV
   // =====================================================
 
-  const parsedData = useMemo(() => {
-    const raw = d3.csvParse(sectorData);
+  useEffect(() => {
+    d3.csv(sectorDataUrl).then((raw) => {
+      const filtered = raw.filter(
+        (d) =>
+          d.variable === "new postings" &&
+          d.jobcountry === "US"
+      );
 
-    const filtered = raw.filter(
-      (d) =>
-        d.variable === "new postings" &&
-        d.jobcountry === "US"
-    );
+      const grouped = d3.group(
+        filtered,
+        (d) => d.display_name
+      );
 
-    const grouped = d3.group(
-      filtered,
-      (d) => d.display_name
-    );
+      const result = [];
 
-    const result = [];
+      grouped.forEach((values, key) => {
+        const cleaned = values
+          .map((d) => ({
+            date: new Date(d.date),
+            value:
+              +d.indeed_job_postings_index,
+          }))
+          .filter(
+            (d) => !isNaN(d.value)
+          );
 
-    grouped.forEach((values, key) => {
-      const cleaned = values
-        .map((d) => ({
-          date: new Date(d.date),
-          value:
-            +d.indeed_job_postings_index,
-        }))
-        .filter(
-          (d) => !isNaN(d.value)
-        );
+        if (cleaned.length > 0) {
+          result.push({
+            name: key,
+            values: cleaned,
+          });
+        }
+      });
 
-      if (cleaned.length > 0) {
-        result.push({
-          name: key,
-          values: cleaned,
-        });
-      }
+      setParsedData(result);
     });
-
-    return result;
   }, []);
 
   // =====================================================
@@ -506,9 +510,7 @@ export default function SectorCollapseChart() {
         marginBottom: "180px",
       }}
     >
-      {/* ===================================================== */}
       {/* TOP CATEGORY BUTTONS */}
-      {/* ===================================================== */}
 
       <div
         style={{
@@ -571,9 +573,7 @@ export default function SectorCollapseChart() {
         )}
       </div>
 
-      {/* ===================================================== */}
       {/* SUB CATEGORY BUTTONS */}
-      {/* ===================================================== */}
 
       <div
         style={{
@@ -665,9 +665,7 @@ export default function SectorCollapseChart() {
         ))}
       </div>
 
-      {/* ===================================================== */}
       {/* SVG */}
-      {/* ===================================================== */}
 
       <svg ref={svgRef}></svg>
     </div>
