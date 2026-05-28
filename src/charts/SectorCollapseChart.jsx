@@ -83,6 +83,11 @@ export default function SectorCollapseChart() {
 
   useEffect(() => {
     d3.csv(sectorDataUrl).then((raw) => {
+
+      // IMPORTANT:
+      // CSV structure:
+      // date,jobcountry,indeed_job_postings_index,variable,display_name
+
       const filtered = raw.filter(
         (d) =>
           d.variable === "new postings" &&
@@ -97,14 +102,24 @@ export default function SectorCollapseChart() {
       const result = [];
 
       grouped.forEach((values, key) => {
+
         const cleaned = values
           .map((d) => ({
             date: new Date(d.date),
+
             value:
               +d.indeed_job_postings_index,
           }))
+
           .filter(
-            (d) => !isNaN(d.value)
+            (d) =>
+              !isNaN(d.value) &&
+              d.date instanceof Date
+          )
+
+          .sort(
+            (a, b) =>
+              a.date - b.date
           );
 
         if (cleaned.length > 0) {
@@ -136,6 +151,7 @@ export default function SectorCollapseChart() {
   // =====================================================
 
   const filteredData = useMemo(() => {
+
     if (!selectedSector) {
       return categoryData;
     }
@@ -143,6 +159,7 @@ export default function SectorCollapseChart() {
     return categoryData.filter(
       (d) => d.name === selectedSector
     );
+
   }, [categoryData, selectedSector]);
 
   // =====================================================
@@ -150,6 +167,7 @@ export default function SectorCollapseChart() {
   // =====================================================
 
   useEffect(() => {
+
     if (!filteredData.length) return;
 
     const svg = d3.select(svgRef.current);
@@ -176,6 +194,7 @@ export default function SectorCollapseChart() {
 
     const x = d3
       .scaleTime()
+
       .domain([
         d3.min(filteredData, (d) =>
           d3.min(
@@ -191,6 +210,7 @@ export default function SectorCollapseChart() {
           )
         ),
       ])
+
       .range([
         margin.left,
         width - margin.right,
@@ -198,21 +218,23 @@ export default function SectorCollapseChart() {
 
     const y = d3
       .scaleLinear()
+
       .domain([
         d3.min(filteredData, (d) =>
           d3.min(
             d.values,
             (v) => v.value
           )
-        ) - 10,
+        ) - 5,
 
         d3.max(filteredData, (d) =>
           d3.max(
             d.values,
             (v) => v.value
           )
-        ) + 10,
+        ) + 5,
       ])
+
       .range([
         height - margin.bottom,
         margin.top,
@@ -224,10 +246,12 @@ export default function SectorCollapseChart() {
 
     svg
       .append("g")
+
       .attr(
         "transform",
         `translate(${margin.left},0)`
       )
+
       .call(
         d3
           .axisLeft(y)
@@ -240,6 +264,7 @@ export default function SectorCollapseChart() {
           )
           .tickFormat("")
       )
+
       .style("color", "#e5e5e5");
 
     // =====================================================
@@ -248,20 +273,24 @@ export default function SectorCollapseChart() {
 
     svg
       .append("g")
+
       .attr(
         "transform",
         `translate(0,${
           height - margin.bottom
         })`
       )
+
       .call(d3.axisBottom(x));
 
     svg
       .append("g")
+
       .attr(
         "transform",
         `translate(${margin.left},0)`
       )
+
       .call(d3.axisLeft(y));
 
     // =====================================================
@@ -270,22 +299,34 @@ export default function SectorCollapseChart() {
 
     svg
       .append("text")
+
       .attr("x", width / 2)
+
       .attr("y", 40)
+
       .attr("text-anchor", "middle")
+
       .style("font-size", "34px")
+
       .style("font-weight", 700)
+
       .text(
         "Hiring Trends by Core Industries"
       );
 
     svg
       .append("text")
+
       .attr("x", width / 2)
+
       .attr("y", 72)
+
       .attr("text-anchor", "middle")
+
       .style("font-size", "16px")
+
       .style("fill", "#777")
+
       .text(
         "Select sectors and hover to compare trajectories"
       );
@@ -296,8 +337,11 @@ export default function SectorCollapseChart() {
 
     const line = d3
       .line()
+
       .x((d) => x(d.date))
+
       .y((d) => y(d.value))
+
       .curve(d3.curveMonotoneX);
 
     // =====================================================
@@ -305,6 +349,7 @@ export default function SectorCollapseChart() {
     // =====================================================
 
     filteredData.forEach((sector) => {
+
       const first =
         sector.values[0]?.value;
 
@@ -329,6 +374,7 @@ export default function SectorCollapseChart() {
 
       svg
         .append("path")
+
         .datum(sector.values)
 
         .attr("fill", "none")
@@ -384,6 +430,7 @@ export default function SectorCollapseChart() {
 
       svg
         .append("text")
+
         .attr(
           "x",
           width -
@@ -445,26 +492,32 @@ export default function SectorCollapseChart() {
 
     svg
       .append("line")
+
       .attr(
         "x1",
         margin.left
       )
+
       .attr(
         "x2",
         width - margin.right
       )
+
       .attr(
         "y1",
         y(100)
       )
+
       .attr(
         "y2",
         y(100)
       )
+
       .attr(
         "stroke",
         "#999"
       )
+
       .attr(
         "stroke-dasharray",
         "5 5"
@@ -476,25 +529,37 @@ export default function SectorCollapseChart() {
 
     svg
       .append("text")
+
       .attr(
         "transform",
         "rotate(-90)"
       )
+
       .attr("x", -height / 2)
+
       .attr("y", 25)
+
       .attr("text-anchor", "middle")
+
       .style("font-size", "15px")
+
       .text(
         "New Job Postings Index (100 = Baseline)"
       );
 
     svg
       .append("text")
+
       .attr("x", width / 2)
+
       .attr("y", height - 20)
+
       .attr("text-anchor", "middle")
+
       .style("font-size", "15px")
+
       .text("Timeline");
+
   }, [filteredData, hoveredLine]);
 
   // =====================================================
@@ -510,6 +575,7 @@ export default function SectorCollapseChart() {
         marginBottom: "180px",
       }}
     >
+
       {/* TOP CATEGORY BUTTONS */}
 
       <div
@@ -521,10 +587,13 @@ export default function SectorCollapseChart() {
           paddingLeft: "40px",
         }}
       >
+
         {Object.keys(sectorGroups).map(
           (category) => (
+
             <button
               key={category}
+
               onClick={() => {
                 setSelectedCategory(
                   category
@@ -534,6 +603,7 @@ export default function SectorCollapseChart() {
                   null
                 );
               }}
+
               style={{
                 padding: "14px 28px",
 
@@ -559,6 +629,7 @@ export default function SectorCollapseChart() {
                     : "#333",
 
                 fontSize: "17px",
+
                 fontWeight: 600,
 
                 cursor: "pointer",
@@ -584,10 +655,12 @@ export default function SectorCollapseChart() {
           paddingLeft: "40px",
         }}
       >
+
         <button
           onClick={() =>
             setSelectedSector(null)
           }
+
           style={{
             padding: "10px 20px",
 
@@ -609,6 +682,7 @@ export default function SectorCollapseChart() {
                 : "#555",
 
             fontSize: "14px",
+
             fontWeight: 600,
 
             cursor: "pointer",
@@ -620,13 +694,16 @@ export default function SectorCollapseChart() {
         {sectorGroups[
           selectedCategory
         ]?.map((sector) => (
+
           <button
             key={sector}
+
             onClick={() =>
               setSelectedSector(
                 sector
               )
             }
+
             style={{
               padding: "10px 20px",
 
@@ -652,6 +729,7 @@ export default function SectorCollapseChart() {
                   : "#555",
 
               fontSize: "14px",
+
               fontWeight: 600,
 
               cursor: "pointer",
@@ -666,7 +744,6 @@ export default function SectorCollapseChart() {
       </div>
 
       {/* SVG */}
-      {/* . */}
 
       <svg ref={svgRef}></svg>
     </div>
