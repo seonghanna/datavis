@@ -43,7 +43,7 @@ export default function QuitsChart() {
   // =====================================
 
   useEffect(() => {
-    d3.csv("/src/data/JOLTS.csv").then(
+    d3.csv("/data/JOLTS.csv").then(
       (data) => {
         const parsed = data
           .filter(

@@ -48,13 +48,13 @@ export default function OccupationChart() {
 
   useEffect(() => {
     Promise.all([
-      d3.csv("/src/data/all_data_M_2019.csv"),
-      d3.csv("/src/data/all_data_M_2020.csv"),
-      d3.csv("/src/data/all_data_M_2021.csv"),
-      d3.csv("/src/data/all_data_M_2022.csv"),
-      d3.csv("/src/data/all_data_M_2023.csv"),
-      d3.csv("/src/data/all_data_M_2024.csv"),
-      d3.csv("/src/data/all_data_M_2025.csv"),
+      d3.csv("/data/all_data_M_2019.csv"),
+      d3.csv("/data/all_data_M_2020.csv"),
+      d3.csv("/data/all_data_M_2021.csv"),
+      d3.csv("/data/all_data_M_2022.csv"),
+      d3.csv("/data/all_data_M_2023.csv"),
+      d3.csv("/data/all_data_M_2024.csv"),
+      d3.csv("/data/all_data_M_2025.csv"),
     ]).then((files) => {
       const years = [
         2019,

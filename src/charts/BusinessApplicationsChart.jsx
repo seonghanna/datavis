@@ -9,7 +9,7 @@ export default function BusinessApplicationsChart() {
 
   useEffect(() => {
     d3.csv(
-      "/src/data/BusinessApplications.csv"
+      "/data/BusinessApplications.csv"
     ).then((data) => {
       const parsed = data.map((d) => ({
         date: new Date(

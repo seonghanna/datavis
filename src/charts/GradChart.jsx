@@ -8,7 +8,7 @@ export default function GradChart() {
 
   useEffect(() => {
 
-    Papa.parse("/src/data/GradUnemployment.csv", {
+    Papa.parse("/data/GradUnemployment.csv", {
 
       download: true,
       header: true,

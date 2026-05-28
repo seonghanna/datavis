@@ -13,7 +13,7 @@ export default function DecouplingChart() {
     // SP500 CSV 읽기
     // -------------------------
 
-    Papa.parse("/src/data/SP500.csv", {
+    Papa.parse("/data/SP500.csv", {
       download: true,
       header: true,
 
@@ -23,7 +23,7 @@ export default function DecouplingChart() {
         // JOLTS CSV 읽기
         // -------------------------
 
-        Papa.parse("/src/data/JOLTS.csv", {
+        Papa.parse("/data/JOLTS.csv", {
           download: true,
           header: true,
 
