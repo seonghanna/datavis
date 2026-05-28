@@ -666,6 +666,7 @@ export default function SectorCollapseChart() {
       </div>
 
       {/* SVG */}
+      {/* . */}
 
       <svg ref={svgRef}></svg>
     </div>
